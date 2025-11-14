@@ -3,8 +3,9 @@ import { Icon } from 'leaflet'
 import { useEffect, useState } from 'react'
 import 'leaflet/dist/leaflet.css'
 import socket from '../utils/socket'
-import busIcon from './assets/busicon.png'
-import meIcon from './assets/me.png'
+import busIcon from '../assets/busicon.png'
+import meIcon from '../assets/me.png'
+import '../App.css'
 
 function ChangeView({ lat, lng }) {
     const map = useMap();
@@ -62,7 +63,7 @@ const MapComponent = () => {
     })
 
     return (
-        <div id="map" className='h-screen w-screen flex justify-center items-center'>
+        <div id="map" className='h-full w-full flex justify-center items-center'>
             <MapContainer center={[userPosition.lat ? userPosition.lat : 0, userPosition.lng ? userPosition.lng : 0]} zoom={16}>
                 <TileLayer url='https://tile.openstreetmap.org/{z}/{x}/{y}.png' attribution='OpenStreetMap ' />
 

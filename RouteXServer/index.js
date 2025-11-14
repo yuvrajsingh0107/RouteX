@@ -1,14 +1,33 @@
 import { Server } from "socket.io";
 import express from 'express'
 import { createServer } from 'http';
+import dotenv from 'dotenv';
+import connectDB from "./db/connectDB.js";
+dotenv.config();
+import cors from 'cors';
 
-const port = 3000;
+
+import busRoutes from './routes/busRoutes.js';
+import bus from './routes/bus.js';
+import admin from './routes/admin.js';
+
+
 const app = express();
 const httpServer = createServer(app);
+
 
 const io = new Server(httpServer, {
     cors: { origin: ['http://localhost:5173'], credentials: true }
 });
+
+connectDB();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors());
+app.use('/bus' , bus);
+app.use('/routes' , busRoutes);
+app.use('/admin', admin);
 
 const busLocations = [
     { busId: 'BUS-21', lat: 22.6043665, lng: 75.6862283, speed: 35.6 },
@@ -34,6 +53,6 @@ io.on("connection", (socket) => {
     socket.emit("busUpdate", busLocations);
 });
 
-httpServer.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+httpServer.listen(process.env.PORT, () => {
+    console.log(`Server is running on http://localhost:${process.env.PORT}`);
 });
