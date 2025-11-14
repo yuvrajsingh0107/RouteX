@@ -3,8 +3,8 @@ import { Icon } from 'leaflet'
 import { useEffect, useState } from 'react'
 import 'leaflet/dist/leaflet.css'
 import socket from '../utils/socket'
-import busIcon from './assets/busicon.png'
-import meIcon from './assets/me.png'
+import busIcon from '../assets/busicon.png'
+import meIcon from '../assets/me.png'
 
 function ChangeView({ lat, lng }) {
     const map = useMap();
@@ -24,11 +24,11 @@ const MapComponent = () => {
         socket.on("busUpdate", (data) => {
             console.log("Message from server:", data);
             setBuses(data);
-        });
+        }); 
 
         return () => {
             socket.off("connect");
-            socket.off("busUpdate");
+            socket.off("busUpdate"); 
         };
     }, []);
 
