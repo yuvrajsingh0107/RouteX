@@ -20,6 +20,15 @@ const io = new Server(httpServer, {
     cors: { origin: ['http://localhost:5173'], credentials: true }
 });
 
+// akk empty array rhe ga
+// jse hi bus ki location update hogi
+// wo bus ki location us array me push kr di jaye gi 
+// agar nhi he to nwe bus add kar di jagi
+const busLocations = [];
+
+
+
+
 connectDB();
 
 app.use(express.json());
@@ -29,28 +38,40 @@ app.use('/bus' , bus);
 app.use('/routes' , busRoutes);
 app.use('/admin', admin);
 
-const busLocations = [
-    { busId: 'BUS-21', lat: 22.6043665, lng: 75.6862283, speed: 35.6 },
-    { busId: 'BUS-22', lat: 22.6050123, lng: 75.6857421, speed: 28.4 },
-    { busId: 'BUS-23', lat: 22.6039418, lng: 75.6870156, speed: 40.2 },
-    { busId: 'BUS-24', lat: 22.6048287, lng: 75.6881949, speed: 32.8 },
-    { busId: 'BUS-25', lat: 22.6034729, lng: 75.6849132, speed: 36.1 },
-    { busId: 'BUS-26', lat: 22.6053894, lng: 75.6868778, speed: 29.7 }
-];
 
 
-setInterval(() => {
-    busLocations.forEach(bus => {
-        bus.lat += (Math.random() - 0.5) * 0.01;
-        bus.lng += (Math.random() - 0.5) * 0.01;
-    }
-    );
-    io.emit("busUpdate", busLocations);
-}, 5000);
+
+// setInterval(() => {
+//     busLocations.forEach(bus => {
+//         bus.lat += (Math.random() - 0.5) * 0.01;
+//         bus.lng += (Math.random() - 0.5) * 0.01;
+//     }
+//     );
+//     io.emit("busUpdate", busLocations);
+// }, 5000);
+
 
 io.on("connection", (socket) => {
     console.log("connected ", socket.id)
-    socket.emit("busUpdate", busLocations);
+    socket.on("busUpdate", (data) => {
+        console.log("Received busUpdate:", data);
+        // check if bus already exists in the array
+        const busExists = busLocations.map((bus) => { 
+            if(bus.busId === data.busId) {
+                bus.lat = data.lat;
+                bus.lng = data.lng;
+                bus.speed = data.speed;
+                bus.timestamp = data.timestamp;
+                return true;
+            }
+    });
+    if(!busExists.includes(true)) {
+        busLocations.push(data);
+    }
+       
+       
+        io.emit("busUpdate", busLocations);
+    })
 });
 
 httpServer.listen(process.env.PORT, () => {
